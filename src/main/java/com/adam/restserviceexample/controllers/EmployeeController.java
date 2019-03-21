@@ -1,8 +1,11 @@
 package com.adam.restserviceexample.controllers;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 import com.adam.restserviceexample.entities.Employee;
 import com.adam.restserviceexample.exceptions.EmployeeNotFoundException;
 import com.adam.restserviceexample.repositories.EmployeeRepository;
+import org.springframework.hateoas.Resource;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,9 +35,15 @@ public class EmployeeController {
     }
 
     @GetMapping("/{id}")
-    public Employee getEmployeeById(@PathVariable Long id) {
-        return employeeRepository.findById(id)
+    public Resource<Employee> getEmployeeById(@PathVariable Long id) {
+        Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new EmployeeNotFoundException(id));
+
+        return new Resource<>(
+                employee,
+                linkTo(methodOn(EmployeeController.class).getEmployeeById(id)).withSelfRel(),
+                linkTo(methodOn(EmployeeController.class).allEmployees()).withRel("employees")
+        );
     }
 
     @PutMapping("/{id}")
