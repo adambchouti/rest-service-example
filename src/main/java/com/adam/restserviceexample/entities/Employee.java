@@ -1,6 +1,7 @@
 package com.adam.restserviceexample.entities;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,6 +12,7 @@ import javax.persistence.Id;
  * @project rest-service-example
  */
 @Data
+@NoArgsConstructor
 @Entity
 public class Employee {
 
