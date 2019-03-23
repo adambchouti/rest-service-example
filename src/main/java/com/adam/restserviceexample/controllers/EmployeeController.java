@@ -9,8 +9,11 @@ import com.adam.restserviceexample.exceptions.EmployeeNotFoundException;
 import com.adam.restserviceexample.repositories.EmployeeRepository;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,8 +49,12 @@ public class EmployeeController {
     }
 
     @PostMapping
-    public Employee addEmployee(@RequestBody Employee newEmployee) {
-        return employeeRepository.save(newEmployee);
+    public ResponseEntity<?> addEmployee(@RequestBody Employee newEmployee) throws URISyntaxException {
+        Resource<Employee> resource = employeeResourceAssembler.toResource(employeeRepository.save(newEmployee));
+
+        return ResponseEntity
+                .created(new URI(resource.getId().expand().getHref()))
+                .body(resource);
     }
 
     @GetMapping("/{id}")
