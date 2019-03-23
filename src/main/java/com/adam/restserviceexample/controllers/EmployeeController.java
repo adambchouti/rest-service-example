@@ -66,9 +66,9 @@ public class EmployeeController {
     }
 
     @PutMapping("/{id}")
-    public Employee replaceEmployee(@RequestBody Employee newEmployee,
-                                    @PathVariable Long id) {
-        return employeeRepository.findById(id)
+    public ResponseEntity<?> replaceEmployee(@RequestBody Employee newEmployee,
+                                    @PathVariable Long id) throws URISyntaxException {
+        Employee updatedEmployee = employeeRepository.findById(id)
                 .map(employee -> {
                    employee.setName(newEmployee.getName());
                    employee.setRole(newEmployee.getRole());
@@ -78,10 +78,20 @@ public class EmployeeController {
                     newEmployee.setId(id);
                     return employeeRepository.save(newEmployee);
                 });
+
+        Resource<Employee> resource = employeeResourceAssembler.toResource(updatedEmployee);
+
+        return ResponseEntity
+                .created(new URI(resource.getId().expand().getHref()))
+                .body(resource);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteEmployee(@PathVariable Long id) {
+    public ResponseEntity<?> deleteEmployee(@PathVariable Long id) {
         employeeRepository.deleteById(id);
+
+        return ResponseEntity
+                .noContent()
+                .build();
     }
 }
